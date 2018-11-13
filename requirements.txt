@@ -1,3 +1,4 @@
 gTTS==2.0.1
+mutagen==1.41.1
 numpy==1.15.4
 python-vlc==3.0.4106

@@ -2,10 +2,13 @@
 import argparse
 import random
 import tempfile
+import time
 
 import gtts
 import gtts.lang
+import mutagen.mp3
 import numpy as np
+# noinspection PyPackageRequirements
 import vlc
 
 DEFAULT_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -43,9 +46,14 @@ def wait_for_enter() -> None:
 
 def say(text: str, lang: str = DEFAULT_LANG, slow: bool = False) -> None:
     tts = gtts.gTTS(text, lang=lang, slow=slow)
+
     with tempfile.NamedTemporaryFile() as file:
         tts.write_to_fp(file)
-        vlc.MediaPlayer(file.name).play()
+        file.flush()
+        vlc.MediaPlayer(file.name).play()  # Non blocking.
+
+        duration = mutagen.mp3.MP3(file.name).info.length
+        time.sleep(duration)  # Make sure the file is open while it's played.
 
 
 def game(add_number: bool = False, alphabet: str = DEFAULT_ALPHABET, end_number: int = DEFAULT_START_NUMBER,
